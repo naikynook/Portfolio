@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kody Naiker</title>
+  <link rel="stylesheet" href="style.css?v=20260703-2350">
+</head>
+<body>
+  <!-- Fixed top interface: name on the left, view controls on the right. -->
+  <header class="top-interface">
+    <a class="site-name" href="#" aria-label="Home">Kody Naiker</a>
+
+    <nav class="view-nav" aria-label="View controls">
+      <button type="button" data-view="list">List View</button>
+      <button class="is-active" type="button" data-view="gallery">Gallery View</button>
+      <button type="button" data-apps>Apps</button>
+    </nav>
+  </header>
+
+  <!-- Floating filter menu. JavaScript uses data-filter to show/hide project cards. -->
+  <nav class="filter-pill" aria-label="Portfolio filters">
+    <button class="is-active" type="button" data-filter="all">All</button>
+    <button type="button" data-filter="projects">Projects</button>
+    <button type="button" data-filter="academic">Academic</button>
+    <button type="button" data-filter="professional">Professional</button>
+    <button type="button" data-about>About</button>
+  </nav>
+
+  <main>
+    <!--
+      Project cards:
+      - data-category controls which filter tab each project belongs to.
+      - data-preview controls the image shown in List View when a title is clicked.
+      - data-preview-fit and data-preview-position control preview cropping/framing.
+    -->
+    <section class="project-stage gallery-view" data-filter="all" aria-label="Project gallery">
+      <article class="project-card card-i" data-category="projects academic" data-preview="assets/final-collage-1.png?v=20260703-2322" data-preview-fit="cover" data-preview-position="center">
+        <a href="#">
+          <span class="project-image image-nycha"></span>
+          <span class="project-label">nycha</span>
+        </a>
+      </article>
+
+      <article class="project-card card-a" data-category="projects academic" data-preview="assets/axon-final1.png?v=20260703-2212" data-preview-fit="contain" data-preview-position="center">
+        <a href="#">
+          <span class="project-image image-axon" style="background: #f7f7f4 url('assets/axon-final1.png?v=20260703-2212') center / contain no-repeat;"></span>
+          <span class="project-label">atlas-study</span>
+        </a>
+      </article>
+
+      <article class="project-card card-b" data-category="projects academic" data-preview="assets/chair-1.png?v=20260703-2157" data-preview-fit="cover" data-preview-position="center">
+        <a href="#">
+          <span class="project-image image-chair"></span>
+          <span class="project-label">spatial-index</span>
+        </a>
+      </article>
+
+      <article class="project-card card-c" data-category="projects professional" data-preview="assets/lamp1.png?v=20260703-2157" data-preview-fit="cover" data-preview-position="center">
+        <a href="#">
+          <span class="project-image image-lamp"></span>
+          <span class="project-label">drawing-system</span>
+        </a>
+      </article>
+
+      <article class="project-card card-d" data-category="projects academic" data-preview="assets/backend-graphic.png?v=20260703-2157" data-preview-fit="contain" data-preview-position="center">
+        <a href="#">
+          <span class="project-image image-backend" style="background: #ffffff url('assets/backend-graphic.png?v=20260703-2157') center / contain no-repeat;"></span>
+          <span class="project-label">light-archive</span>
+        </a>
+      </article>
+
+      <article class="project-card card-e" data-category="projects professional" data-preview="assets/lamp-2.png?v=20260703-2157" data-preview-fit="cover" data-preview-position="center bottom">
+        <a href="#">
+          <span class="project-image image-lamp-two"></span>
+          <span class="project-label">interface-study</span>
+        </a>
+      </article>
+
+      <article class="project-card card-h" data-category="projects academic" data-preview="assets/garment-making.png?v=20260703-2259" data-preview-fit="contain" data-preview-position="center">
+        <a href="#">
+          <span class="project-image image-garment"></span>
+          <span class="project-label">garment-making</span>
+        </a>
+      </article>
+
+      <article class="project-card card-f" data-category="projects professional" data-preview="" data-preview-fit="cover" data-preview-position="center">
+        <a href="#">
+          <span class="project-image image-map"></span>
+          <span class="project-label">material-map</span>
+        </a>
+      </article>
+
+      <article class="project-card card-g" data-category="projects professional" data-preview="assets/bubblegum.png?v=20260703-2336" data-preview-fit="cover" data-preview-position="center">
+        <a href="#">
+          <span class="project-image image-bubblegum"></span>
+          <span class="project-label">model-room</span>
+        </a>
+      </article>
+    </section>
+  </main>
+
+  <!-- Dedicated preview layer used only in List View. JavaScript swaps its image. -->
+  <div class="list-preview" aria-hidden="true"></div>
+
+  <!-- Pop-up panels controlled by the About and Apps buttons. -->
+  <aside class="about-panel" aria-label="About">
+    <p>I am currently pursuing an M. Arch and and M.S. in Computational Design Practices at Columbia University. My interests lie at the intersection of art, technology, and the built environment.</p>
+  </aside>
+
+  <aside class="apps-panel" aria-label="Apps">
+    <a href="#">notes.local</a>
+    <a href="#">archive.local</a>
+    <a href="#">viewer.local</a>
+  </aside>
+
+  <!-- Reset button returns the page to Gallery View / All projects. -->
+  <button class="reset-mark" type="button" aria-label="Reset view">×</button>
+
+  <script src="script.js?v=20260703-2350"></script>
+</body>
+</html>

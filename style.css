@@ -1,0 +1,666 @@
+/* Global design tokens for the pale interface, text color, and glow colors. */
+:root {
+  --page: #fbfbfa;
+  --ink: #111111;
+  --muted: #6f6f6f;
+  --panel: rgba(255, 255, 255, 0.88);
+  --glow: rgba(255, 143, 204, 0.48);
+  --glow-strong: rgba(255, 105, 180, 0.72);
+  --professional-glow: rgba(117, 232, 139, 0.5);
+  --professional-glow-strong: rgba(68, 210, 94, 0.76);
+  --shadow: rgba(0, 0, 0, 0.18);
+}
+
+/* Base reset and shared typography. */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 1200px;
+  margin: 0;
+  background: var(--page);
+  color: var(--ink);
+  font-family: "Courier New", Courier, monospace;
+  font-size: 13px;
+  line-height: 1.2;
+}
+
+button,
+a {
+  color: inherit;
+  font: inherit;
+}
+
+a {
+  text-decoration: none;
+}
+
+button {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+button:hover,
+a:hover,
+.is-active {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+button:hover,
+a:hover {
+  text-shadow: 0 0 16px var(--glow-strong);
+}
+
+button:focus-visible,
+a:focus-visible {
+  outline: 1px solid var(--ink);
+  outline-offset: 4px;
+}
+
+/* Fixed top interface: portfolio name and view controls. */
+.top-interface {
+  position: fixed;
+  top: 28px;
+  left: 26px;
+  right: 48px;
+  z-index: 20;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  pointer-events: none;
+}
+
+.site-name,
+.view-nav,
+.filter-pill,
+.reset-mark {
+  pointer-events: auto;
+}
+
+.site-name {
+  letter-spacing: 0.01em;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.view-nav {
+  display: flex;
+  gap: 31px;
+  line-height: 1;
+}
+
+/* Floating pill filter menu. */
+.filter-pill {
+  position: fixed;
+  top: 70px;
+  left: 50%;
+  z-index: 30;
+  display: flex;
+  gap: 34px;
+  align-items: center;
+  transform: translateX(-50%);
+  padding: 16px 24px 15px;
+  border-radius: 999px;
+  background: var(--panel);
+  box-shadow:
+    0 18px 54px rgba(0, 0, 0, 0.22),
+    0 0 50px rgba(255, 255, 255, 0.9),
+    0 0 46px rgba(255, 143, 204, 0.22);
+  backdrop-filter: blur(14px);
+  white-space: nowrap;
+}
+
+main {
+  min-height: 100vh;
+}
+
+/* The gallery stage is a positioned canvas for the staggered project cards. */
+.project-stage {
+  position: relative;
+  width: 560px;
+  height: 1160px;
+  margin: 0 auto;
+}
+
+.project-card {
+  transition:
+    opacity 180ms ease,
+    transform 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.project-card.is-hidden {
+  display: none;
+}
+
+/* Default gallery card treatment, including the soft glow. */
+.gallery-view .project-card {
+  position: absolute;
+  overflow: hidden;
+  border-radius: 7px;
+  background: white;
+  box-shadow:
+    0 0 22px var(--glow-strong),
+    0 0 56px var(--glow),
+    0 10px 22px rgba(0, 0, 0, 0.12);
+}
+
+.gallery-view .project-card:hover {
+  z-index: 50;
+  transform: translateY(-3px);
+  box-shadow:
+    0 0 32px var(--glow-strong),
+    0 0 86px var(--glow),
+    0 12px 28px rgba(0, 0, 0, 0.18);
+}
+
+/* Professional cards use green glow; academic/default cards use pink glow. */
+.gallery-view .project-card[data-category~="professional"] {
+  box-shadow:
+    0 0 22px var(--professional-glow-strong),
+    0 0 56px var(--professional-glow),
+    0 10px 22px rgba(0, 0, 0, 0.12);
+}
+
+.gallery-view .project-card[data-category~="professional"]:hover {
+  box-shadow:
+    0 0 32px var(--professional-glow-strong),
+    0 0 86px var(--professional-glow),
+    0 12px 28px rgba(0, 0, 0, 0.18);
+}
+
+.project-card a {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Individual card positions for the All gallery layout. */
+.card-i {
+  top: 196px;
+  left: -180px;
+  z-index: 1;
+  width: 210px;
+  height: 315px;
+}
+
+.card-a {
+  top: 196px;
+  left: 42px;
+  z-index: 1;
+  width: 180px;
+  height: 259px;
+}
+
+.card-b {
+  top: 196px;
+  left: 232px;
+  z-index: 3;
+  width: 240px;
+  height: 216px;
+}
+
+.card-c {
+  top: 200px;
+  left: 492px;
+  z-index: 2;
+  width: 224px;
+  height: 196px;
+}
+
+.card-d {
+  top: 536px;
+  left: -38px;
+  z-index: 1;
+  width: 240px;
+  height: 178px;
+}
+
+.card-e {
+  top: 426px;
+  left: 252px;
+  z-index: 1;
+  width: 176px;
+  height: 210px;
+}
+
+.card-h {
+  top: 426px;
+  left: 448px;
+  z-index: 1;
+  width: 210px;
+  height: 170px;
+}
+
+.card-f {
+  top: 735px;
+  left: 92px;
+  z-index: 1;
+  width: 236px;
+  height: 160px;
+}
+
+.card-g {
+  top: 702px;
+  left: 342px;
+  z-index: 1;
+  width: 210px;
+  height: 274px;
+}
+
+/* Reposition selected cards when the Academic filter is active. */
+.gallery-view[data-filter="academic"] .card-d {
+  top: 536px;
+  left: -38px;
+}
+
+.gallery-view[data-filter="academic"] .card-f {
+  top: 426px;
+  left: 214px;
+}
+
+.gallery-view[data-filter="academic"] .card-h {
+  top: 426px;
+  left: 448px;
+}
+
+.gallery-view[data-filter="academic"] .card-i {
+  top: 196px;
+  left: -180px;
+}
+
+/* Reposition selected cards when the Professional filter is active. */
+.gallery-view[data-filter="professional"] .card-e {
+  top: 196px;
+  left: -36px;
+}
+
+.gallery-view[data-filter="professional"] .card-f {
+  top: 464px;
+  left: 158px;
+}
+
+.gallery-view[data-filter="professional"] .card-c {
+  top: 200px;
+  left: 412px;
+}
+
+.gallery-view[data-filter="professional"] .card-g {
+  top: 594px;
+  left: 92px;
+}
+
+.project-image {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+
+/* Project labels are hidden until hover in Gallery View. */
+.project-label {
+  position: absolute;
+  left: 9px;
+  bottom: 8px;
+  z-index: 4;
+  max-width: calc(100% - 18px);
+  padding: 3px 5px;
+  background: rgba(255, 255, 255, 0.78);
+  color: var(--ink);
+  font-size: 11px;
+  opacity: 0;
+  transition: opacity 160ms ease;
+}
+
+.project-card:hover .project-label {
+  opacity: 1;
+}
+
+/* Image styles for each project card. Some are image assets, others are CSS graphics. */
+.image-atlas {
+  background:
+    radial-gradient(circle at 15% 30%, #7cff75 0 8%, transparent 8.5%),
+    radial-gradient(circle at 31% 32%, #d84fa2 0 8%, transparent 8.5%),
+    radial-gradient(circle at 16% 64%, #f0d536 0 7%, transparent 7.5%),
+    radial-gradient(circle at 35% 65%, #76e4ff 0 8%, transparent 8.5%),
+    repeating-radial-gradient(circle at 74% 48%, transparent 0 9px, #5ede76 10px 12px, transparent 13px 19px),
+    conic-gradient(from 15deg at 74% 48%, #f2d93c, #4ee778, #0e0c1a, #df3b8c, #f2d93c),
+    #111;
+}
+
+.image-axon {
+  background: #f7f7f4 url("assets/axon-final1.png") center / contain no-repeat;
+}
+
+.image-nycha {
+  background: #050807 url("assets/final-collage-1.png") center / cover no-repeat;
+}
+
+.image-atlas::after,
+.image-installation::after,
+.image-projection::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.14), transparent 40%);
+  mix-blend-mode: screen;
+}
+
+.image-installation {
+  background:
+    radial-gradient(circle at 42% 43%, rgba(16, 13, 26, 0.88) 0 19%, transparent 20%),
+    repeating-radial-gradient(circle at 42% 43%, #151515 0 4px, #ead733 5px 8px, #46d46d 9px 11px, transparent 12px 18px),
+    linear-gradient(100deg, #cdbfa8 0 40%, #f4efe7 41% 100%);
+}
+
+.image-chair {
+  background: #f4f4f1 url("assets/chair-1.png") center / cover no-repeat;
+}
+
+.image-installation::before {
+  content: "";
+  position: absolute;
+  right: 18px;
+  top: 38px;
+  width: 86px;
+  height: 120px;
+  background:
+    radial-gradient(circle, #161616 0 4px, transparent 5px) 0 0 / 25px 25px,
+    linear-gradient(135deg, transparent 45%, #ed5da3 46% 50%, transparent 51%),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.14), transparent);
+}
+
+.image-drawing {
+  background:
+    radial-gradient(circle at 28% 28%, transparent 0 21px, rgba(30, 30, 30, 0.2) 22px 23px, transparent 24px),
+    linear-gradient(rgba(65, 82, 160, 0.15) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(65, 82, 160, 0.15) 1px, transparent 1px),
+    #fbfbfb;
+  background-size: auto, 17px 17px, 17px 17px, auto;
+}
+
+.image-lamp {
+  background: #24231f url("assets/lamp1.png") center / cover no-repeat;
+}
+
+.image-projection {
+  background:
+    radial-gradient(circle at 58% 50%, transparent 0 36px, #315eff 37px 38px, transparent 39px),
+    radial-gradient(circle at 58% 50%, transparent 0 54px, rgba(80, 110, 255, 0.75) 55px 56px, transparent 57px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.08), transparent 38%),
+    #161616;
+}
+
+.image-backend {
+  background: #ffffff url("assets/backend-graphic.png") center / contain no-repeat;
+}
+
+.image-grid {
+  background:
+    linear-gradient(90deg, transparent 18%, #2d6eb9 19% 23%, transparent 24% 42%, #2d6eb9 43% 47%, transparent 48% 66%, #2d6eb9 67% 71%, transparent 72%),
+    linear-gradient(transparent 26%, #2d6eb9 27% 31%, transparent 32% 56%, #2d6eb9 57% 61%, transparent 62%),
+    linear-gradient(rgba(0, 0, 0, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.08) 1px, transparent 1px),
+    #f7f7f6;
+  background-size: auto, auto, 18px 18px, 18px 18px, auto;
+}
+
+.image-lamp-two {
+  background: #f1f1ec url("assets/lamp-2.png") center bottom / cover no-repeat;
+}
+
+.image-garment {
+  background: #ffffff url("assets/garment-making.png") center / contain no-repeat;
+}
+
+.image-map {
+  background:
+    radial-gradient(circle at 38% 52%, #ff7ebb 0 6%, transparent 6.5%),
+    radial-gradient(circle at 62% 34%, #71df8a 0 5%, transparent 5.5%),
+    radial-gradient(circle at 68% 68%, #476dff 0 4%, transparent 4.5%),
+    linear-gradient(30deg, transparent 47%, rgba(0, 0, 0, 0.24) 48% 49%, transparent 50%),
+    linear-gradient(115deg, transparent 49%, rgba(0, 0, 0, 0.18) 50% 51%, transparent 52%),
+    #f1f0ec;
+}
+
+.image-model {
+  background:
+    linear-gradient(120deg, transparent 0 42%, rgba(0, 0, 0, 0.16) 43% 44%, transparent 45%),
+    linear-gradient(40deg, transparent 0 55%, rgba(255, 255, 255, 0.55) 56% 58%, transparent 59%),
+    radial-gradient(circle at 55% 35%, rgba(89, 112, 255, 0.5), transparent 38px),
+    #d7d2c8;
+}
+
+.image-bubblegum {
+  background: #050505 url("assets/bubblegum.png") center / cover no-repeat;
+}
+
+/* List View turns the project cards into a simple text index. */
+.list-view {
+  width: calc(100vw - 96px);
+  max-width: none;
+  height: auto;
+  margin: 166px 0 120px 48px;
+}
+
+.list-view .project-card {
+  position: static;
+  width: max-content;
+  max-width: 100%;
+  height: auto;
+  margin-bottom: 8px;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.list-view .project-card a {
+  display: inline;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.list-view .project-card.is-selected a {
+  text-shadow:
+    0 0 14px var(--glow-strong),
+    0 0 42px var(--glow);
+}
+
+.list-view .project-card.is-selected[data-category~="professional"] a {
+  text-shadow:
+    0 0 14px var(--professional-glow-strong),
+    0 0 42px var(--professional-glow);
+}
+
+.list-view .project-image {
+  display: none;
+}
+
+.list-view .project-card.is-selected .project-image {
+  display: none;
+}
+
+.list-preview {
+  display: none;
+}
+
+body.is-list-view .list-preview {
+  position: fixed;
+  inset: auto;
+  top: 170px;
+  left: 50%;
+  z-index: 15;
+  display: block;
+  width: min(34vw, 360px);
+  height: min(34vw, 360px);
+  transform: translateX(-50%);
+  border-radius: 7px;
+  background-color: #f7f7f4;
+  box-shadow:
+    0 0 22px var(--glow-strong),
+    0 0 56px var(--glow),
+    0 10px 22px rgba(0, 0, 0, 0.12);
+  pointer-events: none;
+}
+
+body.is-list-view .list-preview.is-professional {
+  box-shadow:
+    0 0 22px var(--professional-glow-strong),
+    0 0 56px var(--professional-glow),
+    0 10px 22px rgba(0, 0, 0, 0.12);
+}
+
+.list-view .project-label {
+  position: static;
+  display: inline;
+  padding: 0;
+  background: transparent;
+  font-size: 13px;
+  opacity: 1;
+}
+
+/* Pop-up panels for About and Apps. */
+.about-panel,
+.apps-panel {
+  position: fixed;
+  z-index: 40;
+  width: min(360px, calc(100vw - 48px));
+  padding: 16px 18px;
+  border-radius: 26px;
+  background: var(--panel);
+  box-shadow:
+    0 18px 48px var(--shadow),
+    0 0 48px rgba(255, 143, 204, 0.22);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 160ms ease, transform 160ms ease;
+}
+
+.about-panel {
+  left: 50%;
+  bottom: 38px;
+  transform: translateX(-50%) translateY(14px);
+}
+
+.apps-panel {
+  top: 116px;
+  right: 38px;
+  display: grid;
+  gap: 9px;
+  transform: translateY(-10px);
+}
+
+.about-panel.is-open {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(0);
+}
+
+.apps-panel.is-open {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.about-panel p {
+  margin: 0;
+}
+
+/* Lower-right reset mark. */
+.reset-mark {
+  position: fixed;
+  right: 20px;
+  bottom: 16px;
+  z-index: 50;
+  font-size: 22px;
+  line-height: 1;
+  text-shadow:
+    0 0 14px var(--glow-strong),
+    0 0 40px var(--glow);
+}
+
+/* Mobile layout: gallery becomes a single-column square-card list. */
+@media (max-width: 760px) {
+  .top-interface {
+    top: 16px;
+    left: 18px;
+    right: 18px;
+  }
+
+  .view-nav {
+    gap: 15px;
+  }
+
+  .filter-pill {
+    top: 52px;
+    max-width: calc(100vw - 28px);
+    gap: 18px;
+    overflow-x: auto;
+    padding: 14px 18px;
+  }
+
+  .project-stage {
+    width: min(100%, 360px);
+    height: auto;
+    margin: 156px auto 80px;
+    display: grid;
+    gap: 22px;
+  }
+
+  .list-view {
+    width: calc(100vw - 36px);
+    margin: 132px 18px 80px;
+  }
+
+  .list-view .project-card {
+    width: max-content;
+    max-width: 100%;
+  }
+
+  .list-view .project-card.is-selected a {
+    display: inline;
+    width: auto;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .gallery-view .project-card {
+    position: relative;
+    top: auto;
+    left: auto;
+    width: 100%;
+    aspect-ratio: 1;
+    height: auto;
+    transform: none;
+  }
+
+  .gallery-view .project-card:hover {
+    transform: translateY(-3px);
+  }
+
+  body.is-list-view .list-preview {
+    position: fixed;
+    top: 148px;
+    left: auto;
+    right: 18px;
+    width: min(44vw, 190px);
+    height: min(44vw, 190px);
+    aspect-ratio: 1;
+    margin: 0;
+    transform: none;
+  }
+
+  .list-view .project-card.is-selected .project-label {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+}
+
