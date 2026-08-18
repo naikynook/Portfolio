@@ -1069,7 +1069,59 @@ body:not(.is-list-view) .reset-mark {
   }
 
   .gallery-view .project-card:hover {
-    transform: translateY(-3px);
+    transform: none;
+  }
+
+  .gallery-view[data-filter="academic"],
+  .gallery-view[data-filter="professional"] {
+    position: relative;
+    top: auto;
+    right: auto;
+    bottom: auto;
+    left: auto;
+    width: min(100% - 28px, 360px);
+    height: auto;
+    margin: 118px auto 80px;
+    padding: 0 0 48px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 22px;
+    overflow: visible;
+  }
+
+  .gallery-view[data-filter="academic"] .gallery-row,
+  .gallery-view[data-filter="academic"] .gallery-row-track,
+  .gallery-view[data-filter="academic"] .gallery-row-set,
+  .gallery-view[data-filter="professional"] .gallery-row,
+  .gallery-view[data-filter="professional"] .gallery-row-track,
+  .gallery-view[data-filter="professional"] .gallery-row-set {
+    display: contents;
+    position: static;
+    inset: auto;
+    width: auto;
+    height: auto;
+    padding: 0;
+    pointer-events: auto;
+    animation: none !important;
+    transform: none !important;
+  }
+
+  .gallery-view[data-filter="academic"] .is-clone,
+  .gallery-view[data-filter="professional"] .is-clone {
+    display: none !important;
+  }
+
+  .gallery-view[data-filter="academic"] .project-card,
+  .gallery-view[data-filter="professional"] .project-card {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    width: min(100%, 300px) !important;
+    max-width: 100%;
+    height: auto !important;
+    margin: 0;
+    cursor: zoom-in;
   }
 
   body.is-list-view .list-preview {

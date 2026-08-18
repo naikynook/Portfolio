@@ -39,6 +39,12 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
+    const current = Number.parseFloat(track.style.getPropertyValue("--loop-distance")) || 0;
+
+    if (current && Math.abs(current - distance) < 8) {
+      return;
+    }
+
     track.style.setProperty("--loop-distance", `${distance}px`);
     track.style.animationDuration = `${Math.max(distance / loopSpeed, 4)}s`;
   }
@@ -312,8 +318,25 @@ document.addEventListener("DOMContentLoaded", () => {
     aboutPanel.classList.remove("is-open");
   });
 
-  window.addEventListener("resize", syncAllLoopDistances);
+  let lastViewportWidth = window.innerWidth;
+
+  function onViewportWidthChange() {
+    const width = window.innerWidth;
+
+    if (Math.abs(width - lastViewportWidth) < 50) {
+      return;
+    }
+
+    lastViewportWidth = width;
+    syncAllLoopDistances();
+  }
+
+  window.addEventListener("resize", onViewportWidthChange);
   window.addEventListener("load", syncAllLoopDistances);
+
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener("resize", onViewportWidthChange);
+  }
 
   // Reset to the default state.
   resetMark.addEventListener("click", () => {
