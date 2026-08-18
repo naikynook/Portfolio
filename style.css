@@ -201,6 +201,7 @@ main {
   overflow: visible;
   background: transparent;
   will-change: transform;
+  backface-visibility: hidden;
   animation: none !important;
 }
 
@@ -309,6 +310,10 @@ body.is-lightbox-video .gallery-lightbox-video {
     0 0 22px var(--glow-strong),
     0 0 56px var(--glow),
     0 10px 22px rgba(0, 0, 0, 0.12);
+}
+
+.gallery-view[data-filter="all"] .project-card {
+  transition: none;
 }
 
 .gallery-view .project-card:hover {
@@ -1005,6 +1010,18 @@ body:not(.is-list-view) .reset-mark {
     top: auto;
     left: auto;
     transform: none;
+  }
+
+  .gallery-view[data-filter="all"] .project-card {
+    box-shadow:
+      0 0 12px var(--glow-strong),
+      0 6px 14px rgba(0, 0, 0, 0.12);
+  }
+
+  .gallery-view[data-filter="all"] .project-card[data-category~="professional"] {
+    box-shadow:
+      0 0 12px var(--professional-glow-strong),
+      0 6px 14px rgba(0, 0, 0, 0.12);
   }
 
   .list-view {

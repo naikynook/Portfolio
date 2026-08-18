@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const tracks = document.querySelectorAll(".gallery-row-track");
   const loopSpeed = 140;
   const loopStates = [];
-  let loopLastTime = 0;
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
   function makeLoopClone(source) {
     const clone = source.cloneNode(true);
@@ -35,20 +35,95 @@ document.addEventListener("DOMContentLoaded", () => {
     const setHeight = loopDistance(source) || source.offsetHeight;
 
     if (!setHeight) {
-      return;
+      return 0;
     }
 
-    const row = track.parentElement;
-    const viewport = Math.max(
-      window.innerHeight,
-      row ? row.clientHeight : 0,
-      stage.clientHeight || 0
-    );
-    const needed = Math.max(3, Math.ceil((viewport * 2) / setHeight) + 2);
+    const viewport = Math.max(window.innerHeight, track.parentElement ? track.parentElement.clientHeight : 0);
+    const needed = Math.max(2, Math.ceil(viewport / setHeight) + 1);
 
     while (track.querySelectorAll(".gallery-row-set").length < needed) {
       track.appendChild(makeLoopClone(source));
     }
+
+    return loopDistance(source) || setHeight;
+  }
+
+  function isMarqueeRunning() {
+    return (
+      stage.classList.contains("gallery-view") &&
+      stage.dataset.filter === "all" &&
+      !document.body.classList.contains("is-gallery-paused") &&
+      !reduceMotion.matches
+    );
+  }
+
+  function startTrackAnimation(state, distance) {
+    const duration = Math.max((distance / loopSpeed) * 1000, 1200);
+    const from = state.direction === "up" ? 0 : -distance;
+    const to = state.direction === "up" ? -distance : 0;
+    let progress = state.phase || 0;
+
+    if (state.animation) {
+      const previous = state.animation.effect && state.animation.effect.getComputedTiming();
+      const previousDuration = previous && Number(previous.duration);
+      const currentTime = Number(state.animation.currentTime);
+      if (previousDuration && Number.isFinite(previousDuration) && Number.isFinite(currentTime)) {
+        progress = (currentTime / previousDuration) % 1;
+      }
+      state.animation.cancel();
+    }
+
+    state.animation = state.track.animate(
+      [
+        { transform: `translate3d(0, ${from}px, 0)` },
+        { transform: `translate3d(0, ${to}px, 0)` },
+      ],
+      {
+        duration,
+        easing: "linear",
+        iterations: Infinity,
+      }
+    );
+    state.animation.currentTime = progress * duration;
+    state.distance = distance;
+    state.phase = 0;
+  }
+
+  function syncMarqueePlayback() {
+    const showAll = stage.classList.contains("gallery-view") && stage.dataset.filter === "all" && !reduceMotion.matches;
+    const running = isMarqueeRunning();
+
+    loopStates.forEach((state) => {
+      if (!showAll) {
+        if (state.animation) {
+          state.animation.cancel();
+          state.animation = null;
+        }
+
+        state.track.style.transform = "";
+        return;
+      }
+
+      const distance = ensureLoopCopies(state.track, state.source);
+
+      if (!distance) {
+        return;
+      }
+
+      if (!state.animation || Math.abs((state.distance || 0) - distance) > 12) {
+        startTrackAnimation(state, distance);
+      }
+
+      if (!state.animation) {
+        return;
+      }
+
+      if (running) {
+        state.animation.play();
+      } else {
+        state.animation.pause();
+      }
+    });
   }
 
   function prepareGalleryLoops() {
@@ -69,7 +144,8 @@ document.addEventListener("DOMContentLoaded", () => {
       loopStates.push({
         track,
         source,
-        offset: 0,
+        animation: null,
+        distance: 0,
         phase: index / tracks.length,
         direction: track.closest(".gallery-row-up") ? "up" : "down",
       });
@@ -77,71 +153,11 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function syncAllLoopDistances() {
-    loopStates.forEach((state) => {
-      ensureLoopCopies(state.track, state.source);
-    });
-  }
-
-  function isMarqueeRunning() {
-    return (
-      stage.classList.contains("gallery-view") &&
-      stage.dataset.filter === "all" &&
-      !document.body.classList.contains("is-gallery-paused") &&
-      !window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    );
-  }
-
-  function wrapOffset(offset, distance) {
-    const wrapped = offset % distance;
-    return wrapped < 0 ? wrapped + distance : wrapped;
-  }
-
-  function tickMarquee(time) {
-    const delta = loopLastTime ? Math.min((time - loopLastTime) / 1000, 0.05) : 0;
-    loopLastTime = time;
-    const running = isMarqueeRunning();
-
-    loopStates.forEach((state) => {
-      const distance = loopDistance(state.source);
-
-      if (!distance) {
-        return;
-      }
-
-      if (state.offset === 0 && state.phase) {
-        state.offset = distance * state.phase;
-        state.phase = 0;
-      }
-
-      if (running) {
-        state.offset += loopSpeed * delta;
-      }
-
-      state.offset = wrapOffset(state.offset, distance);
-
-      if (!running && stage.dataset.filter !== "all") {
-        state.track.style.transform = "";
-        return;
-      }
-
-      const y = state.direction === "up" ? -state.offset : state.offset - distance;
-      state.track.style.transform = `translate3d(0, ${y}px, 0)`;
-    });
-
-    requestAnimationFrame(tickMarquee);
+    syncMarqueePlayback();
   }
 
   prepareGalleryLoops();
-  requestAnimationFrame(tickMarquee);
-
-  if (typeof ResizeObserver !== "undefined") {
-    loopStates.forEach((state) => {
-      const observer = new ResizeObserver(() => {
-        ensureLoopCopies(state.track, state.source);
-      });
-      observer.observe(state.source);
-    });
-  }
+  requestAnimationFrame(syncMarqueePlayback);
 
   const cards = document.querySelectorAll(".project-card:not(.is-clone)");
   const galleryCards = document.querySelectorAll(".project-card");
@@ -313,6 +329,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     lightbox.setAttribute("aria-hidden", "false");
     document.body.classList.add("is-lightbox-open", "is-gallery-paused");
+    syncMarqueePlayback();
   }
 
   function closeLightbox(resumeMotion) {
@@ -328,6 +345,8 @@ document.addEventListener("DOMContentLoaded", () => {
     if (resumeMotion) {
       document.body.classList.remove("is-gallery-paused");
     }
+
+    syncMarqueePlayback();
   }
 
   // Gallery clicks: pause/resume All, fullscreen an icon, close by clicking the background.
@@ -359,6 +378,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (clickedCard) {
       if (isAll && !isPaused) {
         document.body.classList.add("is-gallery-paused");
+        syncMarqueePlayback();
         return;
       }
 
@@ -368,6 +388,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (isAll) {
       document.body.classList.toggle("is-gallery-paused");
+      syncMarqueePlayback();
     }
   });
 
