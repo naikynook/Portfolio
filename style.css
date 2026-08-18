@@ -205,39 +205,7 @@ main {
   padding: 0;
   overflow: visible;
   background: transparent;
-}
-
-.gallery-view[data-filter="all"].is-loop-ready .gallery-row-track {
-  animation-duration: 22s;
-  animation-timing-function: linear;
-  animation-iteration-count: infinite;
-  animation-fill-mode: both;
-}
-
-.gallery-view[data-filter="all"].is-loop-ready .gallery-row-down .gallery-row-track {
-  animation-name: gallery-scroll-down;
-}
-
-.gallery-view[data-filter="all"].is-loop-ready .gallery-row-up .gallery-row-track {
-  animation-name: gallery-scroll-up;
-}
-
-.gallery-view[data-filter="all"].is-loop-ready .gallery-row:nth-child(1) .gallery-row-track {
-  animation-duration: 20s;
-}
-
-.gallery-view[data-filter="all"].is-loop-ready .gallery-row:nth-child(2) .gallery-row-track {
-  animation-duration: 26s;
-  animation-delay: -9s;
-}
-
-.gallery-view[data-filter="all"].is-loop-ready .gallery-row:nth-child(3) .gallery-row-track {
-  animation-duration: 22s;
-  animation-delay: -4s;
-}
-
-body.is-gallery-paused .gallery-view[data-filter="all"] .gallery-row-track {
-  animation-play-state: paused;
+  animation: none;
 }
 
 .gallery-row-set {
@@ -309,26 +277,6 @@ body.is-lightbox-video .gallery-lightbox-image {
 
 body.is-lightbox-video .gallery-lightbox-video {
   display: block;
-}
-
-@keyframes gallery-scroll-down {
-  from {
-    transform: translate3d(0, calc(-1 * var(--loop-distance, 25%)), 0.1px);
-  }
-
-  to {
-    transform: translate3d(0, 0, 0.1px);
-  }
-}
-
-@keyframes gallery-scroll-up {
-  from {
-    transform: translate3d(0, 0, 0.1px);
-  }
-
-  to {
-    transform: translate3d(0, calc(-1 * var(--loop-distance, 25%)), 0.1px);
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {

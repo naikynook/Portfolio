@@ -2,6 +2,10 @@ document.addEventListener("DOMContentLoaded", () => {
   // Cache the main elements that the controls will update.
   const stage = document.querySelector(".project-stage");
   const tracks = document.querySelectorAll(".gallery-row-track");
+  const loopSpeed = 140;
+  const loopStates = [];
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  let loopTime = 0;
 
   function makeLoopClone(source) {
     const clone = source.cloneNode(true);
@@ -14,36 +18,82 @@ document.addEventListener("DOMContentLoaded", () => {
     return clone;
   }
 
-  function lockLoopDistance() {
-    let ready = true;
+  function measureDistance(source) {
+    const next = source.nextElementSibling;
 
-    tracks.forEach((track) => {
-      if (track.style.getPropertyValue("--loop-distance")) {
+    if (next && next.classList.contains("gallery-row-set")) {
+      const distance = next.offsetTop - source.offsetTop;
+
+      if (distance > 0) {
+        return Math.round(distance);
+      }
+    }
+
+    return Math.round(source.offsetHeight);
+  }
+
+  function fillCopies(state) {
+    const distance = measureDistance(state.source);
+
+    if (!distance) {
+      return 0;
+    }
+
+    const viewport = Math.max(window.innerHeight, state.track.parentElement ? state.track.parentElement.clientHeight : 0);
+    const needed = Math.max(2, Math.ceil(viewport / distance) + 1);
+
+    while (state.track.querySelectorAll(".gallery-row-set").length < needed) {
+      state.track.appendChild(makeLoopClone(state.source));
+    }
+
+    return measureDistance(state.source) || distance;
+  }
+
+  function isLooping() {
+    return (
+      stage.classList.contains("gallery-view") &&
+      stage.dataset.filter === "all" &&
+      !document.body.classList.contains("is-gallery-paused") &&
+      !reduceMotion.matches
+    );
+  }
+
+  function tickLoop(now) {
+    const delta = loopTime ? Math.min((now - loopTime) / 1000, 0.05) : 0;
+    loopTime = now;
+    const running = isLooping();
+    const showAll = stage.classList.contains("gallery-view") && stage.dataset.filter === "all";
+
+    loopStates.forEach((state) => {
+      if (!state.distance) {
+        state.distance = fillCopies(state);
+      }
+
+      if (!state.distance) {
         return;
       }
 
-      const source = track.querySelector(".gallery-row-set:not(.is-clone)");
-      const next = source && source.nextElementSibling;
-      const distance = next && next.classList.contains("gallery-row-set")
-        ? next.offsetTop - source.offsetTop
-        : source ? source.offsetHeight : 0;
+      if (running) {
+        state.offset += loopSpeed * delta;
 
-      if (!distance) {
-        ready = false;
+        while (state.offset >= state.distance) {
+          state.offset -= state.distance;
+        }
+      }
+
+      if (!showAll) {
         return;
       }
 
-      track.style.setProperty("--loop-distance", `${Math.round(distance)}px`);
-      track.style.animationDuration = `${Math.max(distance / 140, 10)}s`;
+      const y = state.direction === "up" ? -state.offset : state.offset - state.distance;
+      state.track.style.transform = `translate3d(0, ${y}px, 0)`;
     });
 
-    if (ready) {
-      stage.classList.add("is-loop-ready");
-    }
+    requestAnimationFrame(tickLoop);
   }
 
   function prepareGalleryLoops() {
-    tracks.forEach((track) => {
+    tracks.forEach((track, index) => {
       const source = track.querySelector(".gallery-row-set:not(.is-clone)");
 
       if (!source) {
@@ -51,16 +101,20 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       track.querySelectorAll(".gallery-row-set.is-clone").forEach((clone) => clone.remove());
-
       track.appendChild(makeLoopClone(source));
-    });
 
-    requestAnimationFrame(() => {
-      requestAnimationFrame(lockLoopDistance);
+      loopStates.push({
+        track,
+        source,
+        offset: index * 120,
+        distance: 0,
+        direction: track.closest(".gallery-row-up") ? "up" : "down",
+      });
     });
   }
 
   prepareGalleryLoops();
+  requestAnimationFrame(tickLoop);
 
   const cards = document.querySelectorAll(".project-card:not(.is-clone)");
   const galleryCards = document.querySelectorAll(".project-card");
