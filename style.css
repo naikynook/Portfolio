@@ -178,7 +178,7 @@ main {
   justify-content: space-between;
   align-items: stretch;
   gap: 8px;
-  overflow: visible;
+  overflow: hidden;
   background: transparent;
 }
 
@@ -205,8 +205,6 @@ main {
   padding: 0;
   overflow: visible;
   background: transparent;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
 }
 
 .gallery-view[data-filter="all"].is-loop-ready .gallery-row-track {

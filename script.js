@@ -52,9 +52,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       track.querySelectorAll(".gallery-row-set.is-clone").forEach((clone) => clone.remove());
 
-      for (let index = 0; index < 3; index += 1) {
-        track.appendChild(makeLoopClone(source));
-      }
+      track.appendChild(makeLoopClone(source));
     });
 
     requestAnimationFrame(() => {
@@ -63,7 +61,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   prepareGalleryLoops();
-  window.addEventListener("load", lockLoopDistance, { once: true });
 
   const cards = document.querySelectorAll(".project-card:not(.is-clone)");
   const galleryCards = document.querySelectorAll(".project-card");
