@@ -3,9 +3,58 @@ document.addEventListener("DOMContentLoaded", () => {
   const stage = document.querySelector(".project-stage");
   const tracks = document.querySelectorAll(".gallery-row-track");
   const loopSpeed = 140;
+  const loopStates = [];
+  let loopLastTime = 0;
+
+  function makeLoopClone(source) {
+    const clone = source.cloneNode(true);
+    clone.classList.add("is-clone");
+    clone.setAttribute("aria-hidden", "true");
+    clone.querySelectorAll(".project-card").forEach((card) => {
+      card.classList.add("is-clone");
+      card.setAttribute("aria-hidden", "true");
+    });
+    return clone;
+  }
+
+  function loopDistance(source) {
+    const next = source.nextElementSibling;
+
+    if (next && next.classList.contains("gallery-row-set")) {
+      const distance = next.offsetTop - source.offsetTop;
+
+      if (distance > 0) {
+        return distance;
+      }
+    }
+
+    return source.offsetHeight;
+  }
+
+  function ensureLoopCopies(track, source) {
+    const setHeight = loopDistance(source) || source.offsetHeight;
+
+    if (!setHeight) {
+      return;
+    }
+
+    const row = track.parentElement;
+    const viewport = Math.max(
+      window.innerHeight,
+      row ? row.clientHeight : 0,
+      stage.clientHeight || 0
+    );
+    const needed = Math.max(3, Math.ceil((viewport * 2) / setHeight) + 2);
+
+    while (track.querySelectorAll(".gallery-row-set").length < needed) {
+      track.appendChild(makeLoopClone(source));
+    }
+  }
 
   function prepareGalleryLoops() {
-    tracks.forEach((track) => {
+    loopStates.length = 0;
+
+    tracks.forEach((track, index) => {
       const source = track.querySelector(".gallery-row-set:not(.is-clone)");
 
       if (!source) {
@@ -13,47 +62,86 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       track.querySelectorAll(".gallery-row-set.is-clone").forEach((clone) => clone.remove());
+      track.style.animation = "none";
+      track.appendChild(makeLoopClone(source));
+      ensureLoopCopies(track, source);
 
-      const clone = source.cloneNode(true);
-      clone.classList.add("is-clone");
-      clone.setAttribute("aria-hidden", "true");
-      clone.querySelectorAll(".project-card").forEach((card) => {
-        card.classList.add("is-clone");
-        card.setAttribute("aria-hidden", "true");
+      loopStates.push({
+        track,
+        source,
+        offset: 0,
+        phase: index / tracks.length,
+        direction: track.closest(".gallery-row-up") ? "up" : "down",
       });
-      track.appendChild(clone);
-      syncLoopDistance(track, source);
     });
   }
 
-  function syncLoopDistance(track, sourceSet) {
-    const source = sourceSet || track.querySelector(".gallery-row-set:not(.is-clone)");
-
-    if (!source) {
-      return;
-    }
-
-    const distance = source.offsetHeight;
-
-    if (!distance) {
-      return;
-    }
-
-    const current = Number.parseFloat(track.style.getPropertyValue("--loop-distance")) || 0;
-
-    if (current && Math.abs(current - distance) < 8) {
-      return;
-    }
-
-    track.style.setProperty("--loop-distance", `${distance}px`);
-    track.style.animationDuration = `${Math.max(distance / loopSpeed, 4)}s`;
+  function syncAllLoopDistances() {
+    loopStates.forEach((state) => {
+      ensureLoopCopies(state.track, state.source);
+    });
   }
 
-  function syncAllLoopDistances() {
-    tracks.forEach((track) => syncLoopDistance(track));
+  function isMarqueeRunning() {
+    return (
+      stage.classList.contains("gallery-view") &&
+      stage.dataset.filter === "all" &&
+      !document.body.classList.contains("is-gallery-paused") &&
+      !window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    );
+  }
+
+  function wrapOffset(offset, distance) {
+    const wrapped = offset % distance;
+    return wrapped < 0 ? wrapped + distance : wrapped;
+  }
+
+  function tickMarquee(time) {
+    const delta = loopLastTime ? Math.min((time - loopLastTime) / 1000, 0.05) : 0;
+    loopLastTime = time;
+    const running = isMarqueeRunning();
+
+    loopStates.forEach((state) => {
+      const distance = loopDistance(state.source);
+
+      if (!distance) {
+        return;
+      }
+
+      if (state.offset === 0 && state.phase) {
+        state.offset = distance * state.phase;
+        state.phase = 0;
+      }
+
+      if (running) {
+        state.offset += loopSpeed * delta;
+      }
+
+      state.offset = wrapOffset(state.offset, distance);
+
+      if (!running && stage.dataset.filter !== "all") {
+        state.track.style.transform = "";
+        return;
+      }
+
+      const y = state.direction === "up" ? -state.offset : state.offset - distance;
+      state.track.style.transform = `translate3d(0, ${y}px, 0)`;
+    });
+
+    requestAnimationFrame(tickMarquee);
   }
 
   prepareGalleryLoops();
+  requestAnimationFrame(tickMarquee);
+
+  if (typeof ResizeObserver !== "undefined") {
+    loopStates.forEach((state) => {
+      const observer = new ResizeObserver(() => {
+        ensureLoopCopies(state.track, state.source);
+      });
+      observer.observe(state.source);
+    });
+  }
 
   const cards = document.querySelectorAll(".project-card:not(.is-clone)");
   const galleryCards = document.querySelectorAll(".project-card");

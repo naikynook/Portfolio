@@ -173,7 +173,7 @@ main {
   justify-content: space-between;
   align-items: stretch;
   gap: 8px;
-  overflow: visible;
+  overflow: hidden;
   background: transparent;
 }
 
@@ -182,6 +182,8 @@ main {
   display: flex;
   justify-content: center;
   min-width: 0;
+  min-height: 0;
+  height: 100%;
   padding: 0 20px;
   overflow: visible;
   background: transparent;
@@ -191,50 +193,28 @@ main {
   display: flex;
   flex-direction: column;
   align-items: center;
+  position: relative;
+  flex: 0 0 auto;
   width: 100%;
   max-width: 100%;
   padding: 0;
   overflow: visible;
   background: transparent;
   will-change: transform;
-  animation-timing-function: linear;
-  animation-iteration-count: infinite;
+  animation: none !important;
 }
 
 .gallery-row-set {
   display: flex;
   flex-direction: column;
   align-items: center;
+  flex: 0 0 auto;
   width: 100%;
   max-width: 100%;
   gap: 28px;
   padding-bottom: 28px;
   overflow: visible;
   background: transparent;
-}
-
-.gallery-row-down .gallery-row-track {
-  animation-name: gallery-scroll-down;
-}
-
-.gallery-row-up .gallery-row-track {
-  animation-name: gallery-scroll-up;
-}
-
-.gallery-row:nth-child(1) .gallery-row-track {
-  animation-delay: 0s;
-}
-
-.gallery-row:nth-child(2) .gallery-row-track {
-  animation-delay: -2.8s;
-}
-
-.gallery-row:nth-child(3) .gallery-row-track {
-  animation-delay: -1.1s;
-}
-
-body.is-gallery-paused .gallery-row-track {
-  animation-play-state: paused;
 }
 
 body.is-gallery-paused .gallery-view[data-filter="all"] .project-card {
@@ -295,29 +275,9 @@ body.is-lightbox-video .gallery-lightbox-video {
   display: block;
 }
 
-@keyframes gallery-scroll-down {
-  from {
-    transform: translate3d(0, calc(-1 * var(--loop-distance, 50%)), 0);
-  }
-
-  to {
-    transform: translate3d(0, 0, 0);
-  }
-}
-
-@keyframes gallery-scroll-up {
-  from {
-    transform: translate3d(0, 0, 0);
-  }
-
-  to {
-    transform: translate3d(0, calc(-1 * var(--loop-distance, 50%)), 0);
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .gallery-row-track {
-    animation: none;
+    animation: none !important;
   }
 }
 
@@ -1030,7 +990,7 @@ body:not(.is-list-view) .reset-mark {
     display: flex;
     flex-direction: row;
     gap: 4px;
-    overflow: visible;
+    overflow: hidden;
     background: transparent;
   }
 
