@@ -18,16 +18,41 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 body {
-  min-height: 1200px;
+  min-height: 100vh;
   margin: 0;
   background: var(--page);
   color: var(--ink);
   font-family: "Courier New", Courier, monospace;
   font-size: 13px;
   line-height: 1.2;
+}
+
+body:not(.is-list-view) {
+  overflow: hidden;
+  height: 100vh;
+}
+
+body:not(.is-list-view):has(.gallery-view[data-filter="academic"]),
+body:not(.is-list-view):has(.gallery-view[data-filter="professional"]) {
+  overflow: auto;
+  height: auto;
+}
+
+body:not(.is-list-view):has(.gallery-view[data-filter="academic"]) main,
+body:not(.is-list-view):has(.gallery-view[data-filter="professional"]) main {
+  min-height: 100vh;
+  height: auto;
+  overflow: visible;
+}
+
+body:not(.is-list-view) main {
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
 }
 
 button,
@@ -123,12 +148,177 @@ main {
   min-height: 100vh;
 }
 
-/* The gallery stage is a positioned canvas for the staggered project cards. */
+/* The gallery fills the screen as three vertical columns, behind the top widgets. */
 .project-stage {
   position: relative;
   width: 560px;
-  height: 1160px;
+  height: 1180px;
   margin: 0 auto;
+}
+
+.gallery-view {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1;
+  width: auto;
+  max-width: none;
+  height: auto;
+  margin: 0;
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: stretch;
+  gap: 8px;
+  overflow: visible;
+  background: transparent;
+}
+
+.gallery-row {
+  flex: 1 1 0;
+  display: flex;
+  justify-content: center;
+  min-width: 0;
+  padding: 0 20px;
+  overflow: visible;
+  background: transparent;
+}
+
+.gallery-row-track {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 100%;
+  padding: 0;
+  overflow: visible;
+  background: transparent;
+  will-change: transform;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+.gallery-row-set {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 100%;
+  gap: 28px;
+  padding-bottom: 28px;
+  overflow: visible;
+  background: transparent;
+}
+
+.gallery-row-down .gallery-row-track {
+  animation-name: gallery-scroll-down;
+}
+
+.gallery-row-up .gallery-row-track {
+  animation-name: gallery-scroll-up;
+}
+
+.gallery-row:nth-child(1) .gallery-row-track {
+  animation-delay: 0s;
+}
+
+.gallery-row:nth-child(2) .gallery-row-track {
+  animation-delay: -2.8s;
+}
+
+.gallery-row:nth-child(3) .gallery-row-track {
+  animation-delay: -1.1s;
+}
+
+body.is-gallery-paused .gallery-row-track {
+  animation-play-state: paused;
+}
+
+body.is-gallery-paused .gallery-view[data-filter="all"] .project-card {
+  cursor: zoom-in;
+}
+
+.gallery-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(251, 251, 250, 0.88);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 180ms ease;
+}
+
+body.is-lightbox-open .gallery-lightbox {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.gallery-lightbox-image,
+.gallery-lightbox-video {
+  max-width: 92vw;
+  max-height: 92vh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 12px;
+  background: white;
+  box-shadow:
+    0 0 32px var(--glow-strong),
+    0 0 86px var(--glow),
+    0 18px 40px rgba(0, 0, 0, 0.18);
+}
+
+.gallery-lightbox-video {
+  display: none;
+  background: #050505;
+}
+
+.gallery-lightbox-image.is-professional,
+.gallery-lightbox-video.is-professional {
+  box-shadow:
+    0 0 32px var(--professional-glow-strong),
+    0 0 86px var(--professional-glow),
+    0 18px 40px rgba(0, 0, 0, 0.18);
+}
+
+body.is-lightbox-video .gallery-lightbox-image {
+  display: none;
+}
+
+body.is-lightbox-video .gallery-lightbox-video {
+  display: block;
+}
+
+@keyframes gallery-scroll-down {
+  from {
+    transform: translate3d(0, calc(-1 * var(--loop-distance, 50%)), 0);
+  }
+
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes gallery-scroll-up {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+
+  to {
+    transform: translate3d(0, calc(-1 * var(--loop-distance, 50%)), 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gallery-row-track {
+    animation: none;
+  }
 }
 
 .project-card {
@@ -142,11 +332,18 @@ main {
   display: none;
 }
 
-/* Default gallery card treatment, including the soft glow. */
+/* Default gallery card treatment, including the soft glow. Aspect ratios stay on each card class. */
 .gallery-view .project-card {
-  position: absolute;
+  position: relative;
+  top: auto;
+  left: auto;
+  z-index: 0;
+  flex: 0 0 auto;
+  height: auto;
+  max-width: 100%;
+  box-sizing: border-box;
   overflow: hidden;
-  border-radius: 7px;
+  border-radius: 12px;
   background: white;
   box-shadow:
     0 0 22px var(--glow-strong),
@@ -155,15 +352,12 @@ main {
 }
 
 .gallery-view .project-card:hover {
-  z-index: 50;
-  transform: translateY(-3px);
   box-shadow:
     0 0 32px var(--glow-strong),
     0 0 86px var(--glow),
     0 12px 28px rgba(0, 0, 0, 0.18);
 }
 
-/* Professional cards use green glow; academic/default cards use pink glow. */
 .gallery-view .project-card[data-category~="professional"] {
   box-shadow:
     0 0 22px var(--professional-glow-strong),
@@ -184,119 +378,280 @@ main {
   height: 100%;
 }
 
-/* Individual card positions for the All gallery layout. */
+/* Individual card positions for the All gallery layout. Cards stagger without overlapping. */
 .card-i {
-  top: 196px;
-  left: -180px;
+  top: 459px;
+  left: -186px;
   z-index: 1;
-  width: 210px;
-  height: 315px;
+  width: 280px;
+  height: 420px;
+  aspect-ratio: 200 / 300;
 }
 
 .card-a {
-  top: 196px;
-  left: 42px;
+  top: 412px;
+  left: 38px;
   z-index: 1;
-  width: 180px;
-  height: 259px;
+  width: 230px;
+  height: 356px;
+  aspect-ratio: 164 / 254;
 }
 
 .card-b {
-  top: 196px;
-  left: 232px;
-  z-index: 3;
-  width: 240px;
-  height: 216px;
+  top: 412px;
+  left: 226px;
+  z-index: 1;
+  width: 328px;
+  height: 218px;
+  aspect-ratio: 234 / 156;
 }
 
 .card-c {
-  top: 200px;
-  left: 492px;
-  z-index: 2;
-  width: 224px;
+  top: 408px;
+  left: 498px;
+  z-index: 1;
+  width: 294px;
   height: 196px;
+  aspect-ratio: 210 / 140;
 }
 
 .card-d {
-  top: 536px;
-  left: -38px;
+  top: 690px;
+  left: 38px;
   z-index: 1;
-  width: 240px;
-  height: 178px;
+  width: 347px;
+  height: 224px;
+  aspect-ratio: 248 / 160;
 }
 
 .card-e {
-  top: 426px;
-  left: 252px;
+  top: 592px;
+  left: 310px;
   z-index: 1;
-  width: 176px;
-  height: 210px;
+  width: 216px;
+  height: 323px;
+  aspect-ratio: 154 / 231;
 }
 
 .card-h {
-  top: 426px;
-  left: 448px;
+  top: 572px;
+  left: 488px;
   z-index: 1;
-  width: 210px;
-  height: 170px;
+  width: 280px;
+  height: 266px;
+  aspect-ratio: 200 / 190;
 }
 
 .card-f {
-  top: 735px;
-  left: 92px;
+  top: 186px;
+  left: 18px;
   z-index: 1;
-  width: 236px;
-  height: 160px;
+  width: 437px;
+  height: 283px;
+  aspect-ratio: 312 / 202;
 }
 
 .card-g {
-  top: 702px;
-  left: 342px;
+  top: 786px;
+  left: 488px;
   z-index: 1;
-  width: 210px;
-  height: 274px;
+  width: 274px;
+  height: 342px;
+  aspect-ratio: 196 / 244;
 }
 
-/* Reposition selected cards when the Academic filter is active. */
-.gallery-view[data-filter="academic"] .card-d {
-  top: 536px;
-  left: -38px;
+.card-j {
+  top: 196px;
+  left: -186px;
+  z-index: 1;
+  width: 252px;
+  height: 335px;
+  aspect-ratio: 180 / 239;
+}
+
+.card-k {
+  top: 204px;
+  left: 354px;
+  z-index: 1;
+  width: 448px;
+  height: 252px;
+  aspect-ratio: 320 / 180;
+}
+
+.card-l {
+  top: 874px;
+  left: 18px;
+  z-index: 1;
+  width: 420px;
+  height: 297px;
+  aspect-ratio: 300 / 212;
+}
+
+.card-m {
+  z-index: 1;
+  width: 220px;
+  height: 275px;
+  aspect-ratio: 4 / 5;
+}
+
+/* Academic and Professional keep cards in the gallery so glow and rounded corners stay. */
+.gallery-view[data-filter="academic"],
+.gallery-view[data-filter="professional"] {
+  position: relative;
+  top: auto;
+  right: auto;
+  bottom: auto;
+  left: 0;
+  width: 100%;
+  height: 920px;
+  margin: 0;
+  padding: 0;
+  display: block;
+  overflow: visible;
+  transform: none;
+}
+
+.gallery-view[data-filter="professional"] {
+  height: 480px;
+}
+
+.gallery-view[data-filter="academic"] .gallery-row,
+.gallery-view[data-filter="professional"] .gallery-row {
+  display: block;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: visible;
+  transform: none;
+  pointer-events: none;
+}
+
+.gallery-view[data-filter="academic"] .gallery-row-track,
+.gallery-view[data-filter="academic"] .gallery-row-set,
+.gallery-view[data-filter="professional"] .gallery-row-track,
+.gallery-view[data-filter="professional"] .gallery-row-set {
+  display: block;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: visible;
+  animation: none !important;
+  transform: none !important;
+  will-change: auto;
+  pointer-events: none;
+}
+
+.gallery-view[data-filter="academic"] .is-clone,
+.gallery-view[data-filter="professional"] .is-clone {
+  display: none !important;
+}
+
+.gallery-view[data-filter="academic"] .project-card,
+.gallery-view[data-filter="professional"] .project-card {
+  position: absolute;
+  max-width: none;
+  height: auto;
+  overflow: hidden;
+  border-radius: 12px;
+  cursor: zoom-in;
+  pointer-events: auto;
+  z-index: 2;
+}
+
+.gallery-view[data-filter="academic"] .card-j {
+  top: 148px;
+  left: calc(50vw - 554px);
+  width: 180px;
+  height: 239px;
+}
+
+.gallery-view[data-filter="academic"] .card-k {
+  top: 160px;
+  left: calc(50vw - 554px + 212px);
+  width: 320px;
+  height: 180px;
+}
+
+.gallery-view[data-filter="academic"] .card-a {
+  top: 148px;
+  left: calc(50vw - 554px + 576px);
+  width: 164px;
+  height: 254px;
+}
+
+.gallery-view[data-filter="academic"] .card-b {
+  top: 168px;
+  left: calc(50vw - 554px + 772px);
+  width: 234px;
+  height: 156px;
 }
 
 .gallery-view[data-filter="academic"] .card-f {
-  top: 426px;
-  left: 214px;
-}
-
-.gallery-view[data-filter="academic"] .card-h {
-  top: 426px;
-  left: 448px;
+  top: 419px;
+  left: calc(50vw - 554px);
+  width: 312px;
+  height: 202px;
 }
 
 .gallery-view[data-filter="academic"] .card-i {
-  top: 196px;
-  left: -180px;
+  top: 372px;
+  left: calc(50vw - 554px + 344px);
+  width: 200px;
+  height: 300px;
 }
 
-/* Reposition selected cards when the Professional filter is active. */
+.gallery-view[data-filter="academic"] .card-h {
+  top: 434px;
+  left: calc(50vw - 554px + 576px);
+  width: 200px;
+  height: 190px;
+}
+
+.gallery-view[data-filter="academic"] .card-l {
+  top: 356px;
+  left: calc(50vw - 554px + 808px);
+  width: 300px;
+  height: 212px;
+}
+
+.gallery-view[data-filter="academic"] .card-d {
+  top: 656px;
+  left: calc(50vw - 554px + 576px);
+  width: 248px;
+  height: 160px;
+}
+
 .gallery-view[data-filter="professional"] .card-e {
-  top: 196px;
-  left: -36px;
-}
-
-.gallery-view[data-filter="professional"] .card-f {
-  top: 464px;
-  left: 158px;
+  top: 148px;
+  left: calc(50vw - 416px);
+  width: 154px;
+  height: 231px;
 }
 
 .gallery-view[data-filter="professional"] .card-c {
-  top: 200px;
-  left: 412px;
+  top: 168px;
+  left: calc(50vw - 416px + 186px);
+  width: 210px;
+  height: 140px;
 }
 
 .gallery-view[data-filter="professional"] .card-g {
-  top: 594px;
-  left: 92px;
+  top: 148px;
+  left: calc(50vw - 416px + 428px);
+  width: 196px;
+  height: 244px;
+}
+
+.gallery-view[data-filter="professional"] .card-m {
+  top: 156px;
+  left: calc(50vw - 416px + 656px);
+  width: 176px;
+  height: 220px;
 }
 
 .project-image {
@@ -421,14 +776,20 @@ main {
   background: #ffffff url("assets/garment-making.png") center / contain no-repeat;
 }
 
-.image-map {
-  background:
-    radial-gradient(circle at 38% 52%, #ff7ebb 0 6%, transparent 6.5%),
-    radial-gradient(circle at 62% 34%, #71df8a 0 5%, transparent 5.5%),
-    radial-gradient(circle at 68% 68%, #476dff 0 4%, transparent 4.5%),
-    linear-gradient(30deg, transparent 47%, rgba(0, 0, 0, 0.24) 48% 49%, transparent 50%),
-    linear-gradient(115deg, transparent 49%, rgba(0, 0, 0, 0.18) 50% 51%, transparent 52%),
-    #f1f0ec;
+.image-smart-room {
+  background: #1a1a1a url("assets/smart-room.png") center / contain no-repeat;
+}
+
+.image-trivariate-map {
+  background: #050505 url("assets/trivariate-map.png") center / contain no-repeat;
+}
+
+.image-pavilion {
+  background: #243528 url("assets/pavilion-configurator.png") center / contain no-repeat;
+}
+
+.image-leech {
+  background: #f7f7f4 url("assets/the-leech.png") center / contain no-repeat;
 }
 
 .image-model {
@@ -443,27 +804,62 @@ main {
   background: #050505 url("assets/bubblegum.png") center / cover no-repeat;
 }
 
+.image-sphere {
+  background: #050505 url("assets/td-sphere.jpg") center / cover no-repeat;
+}
+
+.project-image video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  pointer-events: none;
+}
+
 /* List View turns the project cards into a simple text index. */
 .list-view {
+  display: block;
   width: calc(100vw - 96px);
   max-width: none;
   height: auto;
   margin: 166px 0 120px 48px;
+  padding: 0;
+  overflow: visible;
+}
+
+.list-view .gallery-row,
+.list-view .gallery-row-track,
+.list-view .gallery-row-set {
+  display: contents;
+  animation: none;
+}
+
+.list-view .gallery-row-set.is-clone,
+.list-view .project-card.is-clone {
+  display: none;
 }
 
 .list-view .project-card {
-  position: static;
-  width: max-content;
+  position: static !important;
+  top: auto !important;
+  left: auto !important;
+  width: max-content !important;
   max-width: 100%;
-  height: auto;
-  margin-bottom: 8px;
+  height: auto !important;
+  aspect-ratio: auto;
+  margin: 0 0 4px;
   border-radius: 0;
   background: transparent;
   box-shadow: none;
 }
 
 .list-view .project-card a {
-  display: inline;
+  display: block;
+  width: auto;
+  height: auto;
+  line-height: 1.2;
   text-decoration: underline;
   text-underline-offset: 3px;
 }
@@ -499,11 +895,14 @@ body.is-list-view .list-preview {
   left: 50%;
   z-index: 15;
   display: block;
-  width: min(34vw, 360px);
-  height: min(34vw, 360px);
+  width: min(42vw, 420px);
+  height: auto;
   transform: translateX(-50%);
   border-radius: 7px;
   background-color: #f7f7f4;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
   box-shadow:
     0 0 22px var(--glow-strong),
     0 0 56px var(--glow),
@@ -574,7 +973,7 @@ body.is-list-view .list-preview.is-professional {
   margin: 0;
 }
 
-/* Lower-right reset mark. */
+/* Lower-right reset mark. Hidden in Gallery View so it does not sit on the moving field. */
 .reset-mark {
   position: fixed;
   right: 20px;
@@ -585,6 +984,10 @@ body.is-list-view .list-preview.is-professional {
   text-shadow:
     0 0 14px var(--glow-strong),
     0 0 40px var(--glow);
+}
+
+body:not(.is-list-view) .reset-mark {
+  display: none;
 }
 
 /* Mobile layout: gallery becomes a single-column square-card list. */
@@ -615,7 +1018,37 @@ body.is-list-view .list-preview.is-professional {
     gap: 22px;
   }
 
+  .gallery-view {
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: auto;
+    height: auto;
+    margin: 0;
+    padding: 16px 12px;
+    display: flex;
+    flex-direction: row;
+    gap: 4px;
+    overflow: visible;
+    background: transparent;
+  }
+
+  .gallery-row {
+    padding: 0 12px;
+    overflow: visible;
+    background: transparent;
+  }
+
+  .gallery-view .project-card {
+    position: relative;
+    top: auto;
+    left: auto;
+    transform: none;
+  }
+
   .list-view {
+    display: block;
     width: calc(100vw - 36px);
     margin: 132px 18px 80px;
   }
@@ -623,6 +1056,9 @@ body.is-list-view .list-preview.is-professional {
   .list-view .project-card {
     width: max-content;
     max-width: 100%;
+    height: auto;
+    aspect-ratio: auto;
+    margin: 0 0 4px;
   }
 
   .list-view .project-card.is-selected a {
@@ -630,16 +1066,6 @@ body.is-list-view .list-preview.is-professional {
     width: auto;
     text-decoration: underline;
     text-underline-offset: 3px;
-  }
-
-  .gallery-view .project-card {
-    position: relative;
-    top: auto;
-    left: auto;
-    width: 100%;
-    aspect-ratio: 1;
-    height: auto;
-    transform: none;
   }
 
   .gallery-view .project-card:hover {
@@ -651,9 +1077,6 @@ body.is-list-view .list-preview.is-professional {
     top: 148px;
     left: auto;
     right: 18px;
-    width: min(44vw, 190px);
-    height: min(44vw, 190px);
-    aspect-ratio: 1;
     margin: 0;
     transform: none;
   }

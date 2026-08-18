@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kody Naiker</title>
-  <link rel="stylesheet" href="style.css?v=20260703-2350">
+  <title>Kodiak Naiker</title>
+  <link rel="stylesheet" href="style.css?v=20260818-1730">
 </head>
 <body>
   <!-- Fixed top interface: name on the left, view controls on the right. -->
   <header class="top-interface">
-    <a class="site-name" href="#" aria-label="Home">Kody Naiker</a>
+    <a class="site-name" href="#" aria-label="Home">Kodiak Naiker</a>
 
     <nav class="view-nav" aria-label="View controls">
       <button type="button" data-view="list">List View</button>
@@ -21,7 +21,6 @@
   <!-- Floating filter menu. JavaScript uses data-filter to show/hide project cards. -->
   <nav class="filter-pill" aria-label="Portfolio filters">
     <button class="is-active" type="button" data-filter="all">All</button>
-    <button type="button" data-filter="projects">Projects</button>
     <button type="button" data-filter="academic">Academic</button>
     <button type="button" data-filter="professional">Professional</button>
     <button type="button" data-about>About</button>
@@ -33,75 +32,130 @@
       - data-category controls which filter tab each project belongs to.
       - data-preview controls the image shown in List View when a title is clicked.
       - data-preview-fit and data-preview-position control preview cropping/framing.
+      - data-aspect matches the gallery card so List View uses the same shape.
     -->
     <section class="project-stage gallery-view" data-filter="all" aria-label="Project gallery">
-      <article class="project-card card-i" data-category="projects academic" data-preview="assets/final-collage-1.png?v=20260703-2322" data-preview-fit="cover" data-preview-position="center">
-        <a href="#">
-          <span class="project-image image-nycha"></span>
-          <span class="project-label">nycha</span>
-        </a>
-      </article>
+      <div class="gallery-row gallery-row-down">
+        <div class="gallery-row-track">
+          <div class="gallery-row-set">
+          <article class="project-card card-j" data-category="projects academic" data-preview="assets/trivariate-map.png?v=20260818-1508" data-preview-fit="contain" data-preview-position="center" data-preview-bg="#050505" data-aspect="180 / 239">
+            <a href="#">
+              <span class="project-image image-trivariate-map"></span>
+              <span class="project-label">trivariate-map</span>
+            </a>
+          </article>
 
-      <article class="project-card card-a" data-category="projects academic" data-preview="assets/axon-final1.png?v=20260703-2212" data-preview-fit="contain" data-preview-position="center">
-        <a href="#">
-          <span class="project-image image-axon" style="background: #f7f7f4 url('assets/axon-final1.png?v=20260703-2212') center / contain no-repeat;"></span>
-          <span class="project-label">atlas-study</span>
-        </a>
-      </article>
+          <article class="project-card card-f" data-category="projects academic" data-preview="assets/smart-room.png?v=20260818-1500" data-preview-fit="contain" data-preview-position="center" data-preview-bg="#1a1a1a" data-aspect="312 / 202">
+            <a href="#">
+              <span class="project-image image-smart-room"></span>
+              <span class="project-label">smart-room</span>
+            </a>
+          </article>
 
-      <article class="project-card card-b" data-category="projects academic" data-preview="assets/chair-1.png?v=20260703-2157" data-preview-fit="cover" data-preview-position="center">
-        <a href="#">
-          <span class="project-image image-chair"></span>
-          <span class="project-label">spatial-index</span>
-        </a>
-      </article>
+          <article class="project-card card-i" data-category="projects academic" data-preview="assets/final-collage-1.png?v=20260703-2322" data-preview-fit="cover" data-preview-position="center" data-aspect="200 / 300">
+            <a href="#">
+              <span class="project-image image-nycha"></span>
+              <span class="project-label">nycha</span>
+            </a>
+          </article>
 
-      <article class="project-card card-c" data-category="projects professional" data-preview="assets/lamp1.png?v=20260703-2157" data-preview-fit="cover" data-preview-position="center">
-        <a href="#">
-          <span class="project-image image-lamp"></span>
-          <span class="project-label">drawing-system</span>
-        </a>
-      </article>
+          <article class="project-card card-k" data-category="projects academic" data-preview="assets/pavilion-configurator.png?v=20260818-1516" data-preview-fit="contain" data-preview-position="center" data-preview-bg="#243528" data-aspect="320 / 180">
+            <a href="#">
+              <span class="project-image image-pavilion"></span>
+              <span class="project-label">pavilion-configurator</span>
+            </a>
+          </article>
 
-      <article class="project-card card-d" data-category="projects academic" data-preview="assets/backend-graphic.png?v=20260703-2157" data-preview-fit="contain" data-preview-position="center">
-        <a href="#">
-          <span class="project-image image-backend" style="background: #ffffff url('assets/backend-graphic.png?v=20260703-2157') center / contain no-repeat;"></span>
-          <span class="project-label">light-archive</span>
-        </a>
-      </article>
+          <article class="project-card card-m" data-category="projects professional" data-preview="assets/td-sphere.jpg?v=20260818-1640" data-preview-video="assets/td-sphere.mp4?v=20260818-1640" data-preview-fit="cover" data-preview-position="center" data-preview-bg="#050505" data-aspect="4 / 5">
+            <a href="#">
+              <span class="project-image image-sphere">
+                <video src="assets/td-sphere.mp4?v=20260818-1640" muted loop playsinline autoplay preload="metadata"></video>
+              </span>
+              <span class="project-label">TD Sphere</span>
+            </a>
+          </article>
+          </div>
+        </div>
+      </div>
 
-      <article class="project-card card-e" data-category="projects professional" data-preview="assets/lamp-2.png?v=20260703-2157" data-preview-fit="cover" data-preview-position="center bottom">
-        <a href="#">
-          <span class="project-image image-lamp-two"></span>
-          <span class="project-label">interface-study</span>
-        </a>
-      </article>
+      <div class="gallery-row gallery-row-up">
+        <div class="gallery-row-track">
+          <div class="gallery-row-set">
+          <article class="project-card card-b" data-category="projects academic" data-preview="assets/chair-1.png?v=20260703-2157" data-preview-fit="cover" data-preview-position="center" data-aspect="234 / 156">
+            <a href="#">
+              <span class="project-image image-chair"></span>
+              <span class="project-label">cnc-chair</span>
+            </a>
+          </article>
 
-      <article class="project-card card-h" data-category="projects academic" data-preview="assets/garment-making.png?v=20260703-2259" data-preview-fit="contain" data-preview-position="center">
-        <a href="#">
-          <span class="project-image image-garment"></span>
-          <span class="project-label">garment-making</span>
-        </a>
-      </article>
+          <article class="project-card card-a" data-category="projects academic" data-preview="assets/axon-final1.png?v=20260703-2212" data-preview-fit="contain" data-preview-position="center" data-aspect="164 / 254">
+            <a href="#">
+              <span class="project-image image-axon" style="background: #f7f7f4 url('assets/axon-final1.png?v=20260703-2212') center / contain no-repeat;"></span>
+              <span class="project-label">tenement-museum</span>
+            </a>
+          </article>
 
-      <article class="project-card card-f" data-category="projects professional" data-preview="" data-preview-fit="cover" data-preview-position="center">
-        <a href="#">
-          <span class="project-image image-map"></span>
-          <span class="project-label">material-map</span>
-        </a>
-      </article>
+          <article class="project-card card-d" data-category="projects academic" data-preview="assets/backend-graphic.png?v=20260703-2157" data-preview-fit="contain" data-preview-position="center" data-aspect="248 / 160">
+            <a href="#">
+              <span class="project-image image-backend" style="background: #ffffff url('assets/backend-graphic.png?v=20260703-2157') center / contain no-repeat;"></span>
+              <span class="project-label">modular-algorithm</span>
+            </a>
+          </article>
 
-      <article class="project-card card-g" data-category="projects professional" data-preview="assets/bubblegum.png?v=20260703-2336" data-preview-fit="cover" data-preview-position="center">
-        <a href="#">
-          <span class="project-image image-bubblegum"></span>
-          <span class="project-label">model-room</span>
-        </a>
-      </article>
+          <article class="project-card card-g" data-category="projects professional" data-preview="assets/bubblegum.png?v=20260703-2336" data-preview-fit="cover" data-preview-position="center" data-aspect="196 / 244">
+            <a href="#">
+              <span class="project-image image-bubblegum"></span>
+              <span class="project-label">bubblegum</span>
+            </a>
+          </article>
+          </div>
+        </div>
+      </div>
+
+      <div class="gallery-row gallery-row-down">
+        <div class="gallery-row-track">
+          <div class="gallery-row-set">
+          <article class="project-card card-e" data-category="projects professional" data-preview="assets/lamp-2.png?v=20260703-2157" data-preview-fit="cover" data-preview-position="center bottom" data-aspect="154 / 231">
+            <a href="#">
+              <span class="project-image image-lamp-two"></span>
+              <span class="project-label">adjustable-lamp</span>
+            </a>
+          </article>
+
+          <article class="project-card card-l" data-category="projects academic" data-preview="assets/the-leech.png?v=20260818-1520" data-preview-fit="contain" data-preview-position="center" data-preview-bg="#f7f7f4" data-aspect="300 / 212">
+            <a href="#">
+              <span class="project-image image-leech"></span>
+              <span class="project-label">the-leech</span>
+            </a>
+          </article>
+
+          <article class="project-card card-h" data-category="projects academic" data-preview="assets/garment-making.png?v=20260703-2259" data-preview-fit="contain" data-preview-position="center" data-aspect="200 / 190">
+            <a href="#">
+              <span class="project-image image-garment"></span>
+              <span class="project-label">garment-making</span>
+            </a>
+          </article>
+
+          <article class="project-card card-c" data-category="projects professional" data-preview="assets/lamp1.png?v=20260703-2157" data-preview-fit="cover" data-preview-position="center" data-aspect="210 / 140">
+            <a href="#">
+              <span class="project-image image-lamp"></span>
+              <span class="project-label">3d-printed-lampshade</span>
+            </a>
+          </article>
+          </div>
+        </div>
+      </div>
     </section>
   </main>
 
   <!-- Dedicated preview layer used only in List View. JavaScript swaps its image. -->
   <div class="list-preview" aria-hidden="true"></div>
+
+  <!-- Fullscreen image overlay for paused Gallery / All view. -->
+  <div class="gallery-lightbox" aria-hidden="true">
+    <img class="gallery-lightbox-image" alt="">
+    <video class="gallery-lightbox-video" muted loop playsinline></video>
+  </div>
 
   <!-- Pop-up panels controlled by the About and Apps buttons. -->
   <aside class="about-panel" aria-label="About">
@@ -109,14 +163,13 @@
   </aside>
 
   <aside class="apps-panel" aria-label="Apps">
-    <a href="#">notes.local</a>
-    <a href="#">archive.local</a>
-    <a href="#">viewer.local</a>
+    <a href="https://naikynook.github.io/Smart-Room-Interface/" target="_blank" rel="noopener noreferrer">Smart Room Interface</a>
+    <a href="https://naikynook.github.io/Pavilion_Configurator/" target="_blank" rel="noopener noreferrer">Pavilion Configurator</a>
   </aside>
 
   <!-- Reset button returns the page to Gallery View / All projects. -->
   <button class="reset-mark" type="button" aria-label="Reset view">×</button>
 
-  <script src="script.js?v=20260703-2350"></script>
+  <script src="script.js?v=20260818-1730"></script>
 </body>
 </html>
