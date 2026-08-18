@@ -2,9 +2,6 @@ document.addEventListener("DOMContentLoaded", () => {
   // Cache the main elements that the controls will update.
   const stage = document.querySelector(".project-stage");
   const tracks = document.querySelectorAll(".gallery-row-track");
-  const loopSpeed = 140;
-  const loopStates = [];
-  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
   function makeLoopClone(source) {
     const clone = source.cloneNode(true);
@@ -17,132 +14,36 @@ document.addEventListener("DOMContentLoaded", () => {
     return clone;
   }
 
-  function loopDistance(source) {
-    const next = source.nextElementSibling;
+  function lockLoopDistance() {
+    let ready = true;
 
-    if (next && next.classList.contains("gallery-row-set")) {
-      const distance = next.offsetTop - source.offsetTop;
-
-      if (distance > 0) {
-        return distance;
-      }
-    }
-
-    return source.offsetHeight;
-  }
-
-  function ensureLoopCopies(track, source) {
-    const setHeight = loopDistance(source) || source.offsetHeight;
-
-    if (!setHeight) {
-      return 0;
-    }
-
-    const viewport = Math.max(window.innerHeight, track.parentElement ? track.parentElement.clientHeight : 0);
-    const needed = Math.max(2, Math.ceil(viewport / setHeight) + 1);
-
-    while (track.querySelectorAll(".gallery-row-set").length < needed) {
-      track.appendChild(makeLoopClone(source));
-    }
-
-    return Math.round(loopDistance(source) || setHeight);
-  }
-
-  function isMarqueeRunning() {
-    return (
-      stage.classList.contains("gallery-view") &&
-      stage.dataset.filter === "all" &&
-      !document.body.classList.contains("is-gallery-paused") &&
-      !reduceMotion.matches
-    );
-  }
-
-  function freezeTrackTransform(track) {
-    const computed = getComputedStyle(track).transform;
-    track.style.transform = !computed || computed === "none"
-      ? "translate3d(0, 0, 0.1px)"
-      : computed;
-  }
-
-  function startTrackAnimation(state, distance) {
-    const duration = Math.max((distance / loopSpeed) * 1000, 1200);
-    const from = state.direction === "up" ? 0 : -distance;
-    const to = state.direction === "up" ? -distance : 0;
-    let progress = state.phase || 0;
-
-    if (state.animation) {
-      const previous = state.animation.effect && state.animation.effect.getComputedTiming();
-      const previousDuration = previous && Number(previous.duration);
-      const currentTime = Number(state.animation.currentTime);
-      if (previousDuration && Number.isFinite(previousDuration) && Number.isFinite(currentTime)) {
-        progress = (currentTime / previousDuration) % 1;
-      }
-      freezeTrackTransform(state.track);
-      state.animation.cancel();
-    }
-
-    state.animation = state.track.animate(
-      [
-        { transform: `translate3d(0, ${from}px, 0.1px)` },
-        { transform: `translate3d(0, ${to}px, 0.1px)` },
-      ],
-      {
-        duration,
-        easing: "linear",
-        iterations: Infinity,
-        fill: "both",
-      }
-    );
-    state.animation.currentTime = progress * duration;
-    state.distance = distance;
-    state.phase = 0;
-
-    state.animation.ready.then(() => {
-      state.track.style.transform = "";
-    }).catch(() => {});
-  }
-
-  function syncMarqueePlayback(restart) {
-    const showAll = stage.classList.contains("gallery-view") && stage.dataset.filter === "all" && !reduceMotion.matches;
-    const running = isMarqueeRunning();
-
-    loopStates.forEach((state) => {
-      if (!showAll) {
-        if (state.animation) {
-          state.animation.pause();
-        }
-
+    tracks.forEach((track) => {
+      if (track.style.getPropertyValue("--loop-distance")) {
         return;
       }
 
-      if (restart || !state.animation) {
-        const distance = ensureLoopCopies(state.track, state.source);
+      const source = track.querySelector(".gallery-row-set:not(.is-clone)");
+      const next = source && source.nextElementSibling;
+      const distance = next && next.classList.contains("gallery-row-set")
+        ? next.offsetTop - source.offsetTop
+        : source ? source.offsetHeight : 0;
 
-        if (!distance) {
-          return;
-        }
-
-        if (!state.animation || Math.abs((state.distance || 0) - distance) > 12) {
-          startTrackAnimation(state, distance);
-        }
-      }
-
-      if (!state.animation) {
+      if (!distance) {
+        ready = false;
         return;
       }
 
-      if (running) {
-        state.animation.play();
-      } else {
-        state.animation.pause();
-      }
+      track.style.setProperty("--loop-distance", `${Math.round(distance)}px`);
+      track.style.animationDuration = `${Math.max(distance / 140, 10)}s`;
     });
+
+    if (ready) {
+      stage.classList.add("is-loop-ready");
+    }
   }
 
   function prepareGalleryLoops() {
-    loopStates.length = 0;
-
-    tracks.forEach((track, index) => {
+    tracks.forEach((track) => {
       const source = track.querySelector(".gallery-row-set:not(.is-clone)");
 
       if (!source) {
@@ -150,27 +51,19 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       track.querySelectorAll(".gallery-row-set.is-clone").forEach((clone) => clone.remove());
-      track.style.animation = "none";
-      track.appendChild(makeLoopClone(source));
-      ensureLoopCopies(track, source);
 
-      loopStates.push({
-        track,
-        source,
-        animation: null,
-        distance: 0,
-        phase: index / tracks.length,
-        direction: track.closest(".gallery-row-up") ? "up" : "down",
-      });
+      for (let index = 0; index < 3; index += 1) {
+        track.appendChild(makeLoopClone(source));
+      }
+    });
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(lockLoopDistance);
     });
   }
 
-  function syncAllLoopDistances() {
-    syncMarqueePlayback();
-  }
-
   prepareGalleryLoops();
-  requestAnimationFrame(syncMarqueePlayback);
+  window.addEventListener("load", lockLoopDistance, { once: true });
 
   const cards = document.querySelectorAll(".project-card:not(.is-clone)");
   const galleryCards = document.querySelectorAll(".project-card");
@@ -208,7 +101,6 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
       cards.forEach((card) => card.classList.remove("is-selected"));
       resetListPreview();
-      syncAllLoopDistances();
     }
   }
 
@@ -228,8 +120,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (stage.classList.contains("list-view")) {
       selectFirstVisibleCard();
-    } else {
-      syncAllLoopDistances();
     }
   }
 
@@ -342,7 +232,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     lightbox.setAttribute("aria-hidden", "false");
     document.body.classList.add("is-lightbox-open", "is-gallery-paused");
-    syncMarqueePlayback();
   }
 
   function closeLightbox(resumeMotion) {
@@ -358,8 +247,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (resumeMotion) {
       document.body.classList.remove("is-gallery-paused");
     }
-
-    syncMarqueePlayback();
   }
 
   // Gallery clicks: pause/resume All, fullscreen an icon, close by clicking the background.
@@ -391,7 +278,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (clickedCard) {
       if (isAll && !isPaused) {
         document.body.classList.add("is-gallery-paused");
-        syncMarqueePlayback();
         return;
       }
 
@@ -401,7 +287,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (isAll) {
       document.body.classList.toggle("is-gallery-paused");
-      syncMarqueePlayback();
     }
   });
 
@@ -439,31 +324,6 @@ document.addEventListener("DOMContentLoaded", () => {
     appsPanel.classList.toggle("is-open");
     aboutPanel.classList.remove("is-open");
   });
-
-  let lastViewportWidth = window.innerWidth;
-
-  function onViewportWidthChange() {
-    const width = window.innerWidth;
-
-    if (Math.abs(width - lastViewportWidth) < 50) {
-      return;
-    }
-
-    lastViewportWidth = width;
-    syncMarqueePlayback(true);
-  }
-
-  window.addEventListener("resize", onViewportWidthChange);
-  window.addEventListener("load", () => {
-    const needsStart = loopStates.some((state) => !state.animation);
-    if (needsStart) {
-      syncMarqueePlayback();
-    }
-  });
-
-  if (window.visualViewport) {
-    window.visualViewport.addEventListener("resize", onViewportWidthChange);
-  }
 
   // Reset to the default state.
   resetMark.addEventListener("click", () => {
