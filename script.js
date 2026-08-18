@@ -45,7 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
       track.appendChild(makeLoopClone(source));
     }
 
-    return loopDistance(source) || setHeight;
+    return Math.round(loopDistance(source) || setHeight);
   }
 
   function isMarqueeRunning() {
@@ -55,6 +55,13 @@ document.addEventListener("DOMContentLoaded", () => {
       !document.body.classList.contains("is-gallery-paused") &&
       !reduceMotion.matches
     );
+  }
+
+  function freezeTrackTransform(track) {
+    const computed = getComputedStyle(track).transform;
+    track.style.transform = !computed || computed === "none"
+      ? "translate3d(0, 0, 0.1px)"
+      : computed;
   }
 
   function startTrackAnimation(state, distance) {
@@ -70,48 +77,54 @@ document.addEventListener("DOMContentLoaded", () => {
       if (previousDuration && Number.isFinite(previousDuration) && Number.isFinite(currentTime)) {
         progress = (currentTime / previousDuration) % 1;
       }
+      freezeTrackTransform(state.track);
       state.animation.cancel();
     }
 
     state.animation = state.track.animate(
       [
-        { transform: `translate3d(0, ${from}px, 0)` },
-        { transform: `translate3d(0, ${to}px, 0)` },
+        { transform: `translate3d(0, ${from}px, 0.1px)` },
+        { transform: `translate3d(0, ${to}px, 0.1px)` },
       ],
       {
         duration,
         easing: "linear",
         iterations: Infinity,
+        fill: "both",
       }
     );
     state.animation.currentTime = progress * duration;
     state.distance = distance;
     state.phase = 0;
+
+    state.animation.ready.then(() => {
+      state.track.style.transform = "";
+    }).catch(() => {});
   }
 
-  function syncMarqueePlayback() {
+  function syncMarqueePlayback(restart) {
     const showAll = stage.classList.contains("gallery-view") && stage.dataset.filter === "all" && !reduceMotion.matches;
     const running = isMarqueeRunning();
 
     loopStates.forEach((state) => {
       if (!showAll) {
         if (state.animation) {
-          state.animation.cancel();
-          state.animation = null;
+          state.animation.pause();
         }
 
-        state.track.style.transform = "";
         return;
       }
 
-      const distance = ensureLoopCopies(state.track, state.source);
+      if (restart || !state.animation) {
+        const distance = ensureLoopCopies(state.track, state.source);
 
-      if (!distance) {
-        return;
-      }
+        if (!distance) {
+          return;
+        }
 
-      if (!state.animation || Math.abs((state.distance || 0) - distance) > 12) {
-        startTrackAnimation(state, distance);
+        if (!state.animation || Math.abs((state.distance || 0) - distance) > 12) {
+          startTrackAnimation(state, distance);
+        }
       }
 
       if (!state.animation) {
@@ -437,11 +450,16 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     lastViewportWidth = width;
-    syncAllLoopDistances();
+    syncMarqueePlayback(true);
   }
 
   window.addEventListener("resize", onViewportWidthChange);
-  window.addEventListener("load", syncAllLoopDistances);
+  window.addEventListener("load", () => {
+    const needsStart = loopStates.some((state) => !state.animation);
+    if (needsStart) {
+      syncMarqueePlayback();
+    }
+  });
 
   if (window.visualViewport) {
     window.visualViewport.addEventListener("resize", onViewportWidthChange);

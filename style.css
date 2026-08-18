@@ -185,7 +185,9 @@ main {
   min-height: 0;
   height: 100%;
   padding: 0 20px;
-  overflow: visible;
+  overflow: hidden;
+  isolation: isolate;
+  transform: translateZ(0);
   background: transparent;
 }
 
@@ -200,8 +202,8 @@ main {
   padding: 0;
   overflow: visible;
   background: transparent;
-  will-change: transform;
   backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
   animation: none !important;
 }
 
@@ -1001,7 +1003,7 @@ body:not(.is-list-view) .reset-mark {
 
   .gallery-row {
     padding: 0 12px;
-    overflow: visible;
+    overflow: hidden;
     background: transparent;
   }
 
